@@ -219,7 +219,7 @@ export function Controls() {
       </div>
 
       {/* Start/Select */}
-      <div className="flex justify-center gap-6 mt-6 -rotate-12">
+      <div className="flex justify-center gap-6 mt-6">
         <GameButton button={BUTTONS.SELECT} className="menu-btn">
           Select
         </GameButton>
