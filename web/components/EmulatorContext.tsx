@@ -221,9 +221,17 @@ export function EmulatorProvider({ children }: { children: React.ReactNode }) {
         console.log(`Game title: ${title}`);
         setGameTitle(title);
 
-        // Try to load existing SRAM
+        // Try to load existing SRAM (with timeout to prevent blocking)
         try {
-          const existingSram = await loadSram(currentRomNameRef.current);
+          console.log("Checking for existing save data...");
+          const sramPromise = loadSram(currentRomNameRef.current);
+          const timeoutPromise = new Promise<Uint8Array | null>((resolve) =>
+            setTimeout(() => resolve(null), 3000)
+          );
+          const existingSram = await Promise.race([
+            sramPromise,
+            timeoutPromise,
+          ]);
           if (existingSram) {
             emulator.load_sram(existingSram);
             console.log("Loaded existing save data");
@@ -232,11 +240,24 @@ export function EmulatorProvider({ children }: { children: React.ReactNode }) {
           console.warn("Failed to load save data:", e);
         }
 
-        // Initialize audio
+        // Initialize audio (non-blocking - don't let audio issues prevent ROM loading)
         const sampleRate = emulator.audio_sample_rate();
         console.log(`Initializing audio at ${sampleRate}Hz`);
-        await initAudio(sampleRate);
-        setAudioVolume(volume);
+        try {
+          // Use timeout to prevent hanging on iOS
+          const audioPromise = initAudio(sampleRate);
+          const timeoutPromise = new Promise<void>((resolve) =>
+            setTimeout(resolve, 2000)
+          );
+          await Promise.race([audioPromise, timeoutPromise]);
+          setAudioVolume(volume);
+          console.log("Audio setup complete");
+        } catch (audioErr) {
+          console.warn(
+            "Audio initialization failed, continuing without audio:",
+            audioErr
+          );
+        }
 
         setIsRunning(true);
         setIsPaused(false);
