@@ -1,30 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  webpack: (config, { isServer }) => {
-    // Handle WASM files
-    config.experiments = {
-      ...config.experiments,
-      asyncWebAssembly: true,
-    };
+  // Output standalone for optimized production builds
+  output: "standalone",
 
-    // Fallback for node modules not available in browser
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-      };
-    }
+  // Disable strict mode for better compatibility with WASM
+  reactStrictMode: false,
 
-    return config;
+  // Turbopack config (Next.js 16 default bundler)
+  turbopack: {
+    // Empty config to acknowledge Turbopack usage
   },
 
-  // Headers for SharedArrayBuffer
+  // Headers for WASM and SharedArrayBuffer support
   async headers() {
     return [
       {
-        source: "/(.*)",
+        source: "/:path*",
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
@@ -33,6 +25,19 @@ const nextConfig: NextConfig = {
           {
             key: "Cross-Origin-Embedder-Policy",
             value: "require-corp",
+          },
+        ],
+      },
+      {
+        source: "/wasm/:path*",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/wasm",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },

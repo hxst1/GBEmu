@@ -22,19 +22,16 @@ export function RomLoader({
     async (file: File) => {
       setError(null);
 
-      // Validate file extension
       if (!file.name.match(/\.(gb|gbc|bin|rom)$/i)) {
         setError("Please select a valid Game Boy ROM file (.gb, .gbc)");
         return;
       }
 
-      // Validate file size (max 8MB)
       if (file.size > 8 * 1024 * 1024) {
         setError("ROM file is too large (maximum 8MB)");
         return;
       }
 
-      // Validate file size (min 32KB)
       if (file.size < 32 * 1024) {
         setError("ROM file is too small (minimum 32KB)");
         return;
@@ -44,11 +41,9 @@ export function RomLoader({
 
       try {
         console.log(`Reading ROM file: ${file.name} (${file.size} bytes)`);
-
         const arrayBuffer = await file.arrayBuffer();
         const data = new Uint8Array(arrayBuffer);
 
-        // Verify data was read correctly
         if (data.length === 0) {
           throw new Error("Failed to read ROM file");
         }
@@ -62,7 +57,6 @@ export function RomLoader({
         setError(errorMessage);
       } finally {
         setIsLoading(false);
-        // Reset input so same file can be loaded again
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
@@ -114,34 +108,33 @@ export function RomLoader({
   }, [loading]);
 
   return (
-    <div className="flex flex-col items-center gap-8 animate-fade-in">
+    <div className="flex flex-col items-center gap-8 animate-fade-in w-full max-w-lg px-4">
       {/* Logo */}
       <div className="text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-wider">
-          GB<span className="text-green-400">Emu</span>
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <GameBoyLogo className="w-12 h-12 md:w-14 md:h-14" />
+        </div>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          <span className="text-(--color-text-primary)">Gameboy</span>
+          <span className="text-gradient">4me</span>
         </h1>
-        <p className="text-gray-400 mt-2">Game Boy & Game Boy Color Emulator</p>
+        <p className="text-(--color-text-muted) mt-2 text-sm md:text-base">
+          Play Game Boy &amp; Game Boy Color games in your browser
+        </p>
       </div>
 
       {/* Error message */}
       {error && (
-        <div className="w-full max-w-md p-4 rounded-lg bg-red-500/20 border border-red-500/50 text-red-300 text-center">
+        <div className="w-full p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-center text-sm">
           {error}
         </div>
       )}
 
       {/* Drop zone */}
       <div
-        className={`
-          w-full max-w-md p-8 rounded-2xl border-2 border-dashed
-          transition-all duration-200
-          ${loading ? "cursor-wait" : "cursor-pointer"}
-          ${
-            isDragging
-              ? "border-green-400 bg-green-400/10"
-              : "border-gray-600 hover:border-gray-500 bg-white/5"
-          }
-        `}
+        className={`drop-zone w-full ${isDragging ? "dragging" : ""} ${
+          loading ? "cursor-wait opacity-70" : ""
+        }`}
         onClick={handleClick}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -156,21 +149,27 @@ export function RomLoader({
           disabled={loading}
         />
 
-        <div className="flex flex-col items-center gap-4 text-center">
+        <div className="flex flex-col items-center gap-4 text-center py-4">
           {loading ? (
             <>
               <LoadingSpinner />
-              <p className="text-white">Loading ROM...</p>
-              <p className="text-gray-500 text-sm">This may take a moment...</p>
+              <div>
+                <p className="text-(--color-text-primary) font-medium">
+                  Loading ROM...
+                </p>
+                <p className="text-(--color-text-muted) text-sm mt-1">
+                  This may take a moment
+                </p>
+              </div>
             </>
           ) : (
             <>
               <CartridgeIcon />
               <div>
-                <p className="text-white font-medium">
-                  Drop a ROM here or click to browse
+                <p className="text-(--color-text-primary) font-medium">
+                  Drop a ROM here or tap to browse
                 </p>
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-(--color-text-muted) text-sm mt-1">
                   Supports .gb and .gbc files
                 </p>
               </div>
@@ -180,30 +179,51 @@ export function RomLoader({
       </div>
 
       {/* Features list */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
-        <Feature icon="🎮" text="Touch Controls" />
-        <Feature icon="💾" text="Auto Save" />
-        <Feature icon="🔊" text="Full Audio" />
-        <Feature icon="📱" text="PWA Support" />
-      </div>
-
-      {/* Instructions */}
-      <div className="text-gray-500 text-xs text-center max-w-md">
-        <p>
-          This emulator runs entirely in your browser. Your ROMs and save data
-          never leave your device.
-        </p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
+        <Feature icon="🎮" title="Touch Controls" />
+        <Feature icon="💾" title="Auto Save" />
+        <Feature icon="🔊" title="Full Audio" />
+        <Feature icon="📱" title="Works Offline" />
       </div>
     </div>
   );
 }
 
-function Feature({ icon, text }: { icon: string; text: string }) {
+function Feature({ icon, title }: { icon: string; title: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-gray-400">
+    <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-(--color-bg-secondary)">
       <span className="text-2xl">{icon}</span>
-      <span>{text}</span>
+      <span className="text-xs text-(--color-text-secondary) font-medium">
+        {title}
+      </span>
     </div>
+  );
+}
+
+function GameBoyLogo({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 64 64" fill="none">
+      <rect
+        x="12"
+        y="4"
+        width="40"
+        height="56"
+        rx="6"
+        className="fill-(--color-accent)"
+      />
+      <rect
+        x="16"
+        y="10"
+        width="32"
+        height="24"
+        rx="2"
+        className="fill-(--color-bg-primary)"
+      />
+      <rect x="20" y="14" width="24" height="16" rx="1" fill="#c8b89a" />
+      <circle cx="24" cy="46" r="6" className="fill-(--color-bg-primary)" />
+      <circle cx="40" cy="42" r="4" className="fill-(--color-bg-primary)" />
+      <circle cx="40" cy="50" r="4" className="fill-(--color-bg-primary)" />
+    </svg>
   );
 }
 
@@ -214,7 +234,7 @@ function CartridgeIcon() {
       height="64"
       viewBox="0 0 64 64"
       fill="none"
-      className="text-gray-400"
+      className="text-(--color-text-muted)"
     >
       <rect
         x="12"
@@ -232,7 +252,7 @@ function CartridgeIcon() {
         height="20"
         rx="2"
         fill="currentColor"
-        opacity="0.3"
+        opacity="0.2"
       />
       <rect
         x="22"
@@ -259,7 +279,7 @@ function CartridgeIcon() {
         height="4"
         rx="2"
         fill="currentColor"
-        opacity="0.5"
+        opacity="0.3"
       />
     </svg>
   );
@@ -267,7 +287,10 @@ function CartridgeIcon() {
 
 function LoadingSpinner() {
   return (
-    <svg className="animate-spin h-12 w-12 text-green-400" viewBox="0 0 24 24">
+    <svg
+      className="animate-spin h-12 w-12 text-(--color-accent)"
+      viewBox="0 0 24 24"
+    >
       <circle
         className="opacity-25"
         cx="12"

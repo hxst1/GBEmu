@@ -48,16 +48,15 @@ export function useAudio() {
         );
 
         await Promise.race([resumePromise, timeoutPromise]);
+      }
 
-        if (ctx.state === "running" as AudioContextState) {
-          console.log("Audio context resumed immediately");
-        } else {
-          console.log(
-            "Audio context suspended, will resume on user interaction"
-          );
-          // Set up listeners to resume on user interaction
-          setupResumeListeners(ctx);
-        }
+      // Check state after resume attempt
+      if (ctx.state === "running") {
+        console.log("Audio context resumed immediately");
+      } else if (ctx.state === "suspended") {
+        console.log("Audio context suspended, will resume on user interaction");
+        // Set up listeners to resume on user interaction
+        setupResumeListeners(ctx);
       } else {
         console.log("Audio context already running");
       }

@@ -1,35 +1,27 @@
 {
-  "name": "GBEmu - Game Boy Emulator",
-  "short_name": "GBEmu",
-  "description": "High-accuracy Game Boy and Game Boy Color emulator in your browser",
+  "name": "Gameboy4me",
+  "short_name": "Gameboy4me",
+  "description": "Play Game Boy games in your browser",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
-  "categories": ["games", "entertainment"],
+  "background_color": "#1a1816",
+  "theme_color": "#b87333",
   "icons": [
     {
-      "src": "/icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon.svg",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Load ROM",
-      "short_name": "Load",
-      "description": "Load a Game Boy ROM file",
-      "url": "/?action=load"
-    }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false
+  "categories": ["games", "entertainment"],
+  "lang": "en",
+  "dir": "ltr"
 }

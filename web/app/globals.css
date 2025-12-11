@@ -1,238 +1,448 @@
 @import "tailwindcss";
 
-:root {
-  --gb-screen: #9bbc0f;
-  --gb-light: #8bac0f;
-  --gb-medium: #306230;
-  --gb-dark: #0f380f;
-  --gb-shell: #8b8b8b;
-  --gb-shell-dark: #5c5c5c;
-  --gb-purple: #463d5e;
-  --gb-red: #cc3333;
-}
+/* Base styles */
+@layer base {
+  :root {
+    color-scheme: light dark;
 
-@theme {
-  --color-gb-screen: var(--gb-screen);
-  --color-gb-light: var(--gb-light);
-  --color-gb-medium: var(--gb-medium);
-  --color-gb-dark: var(--gb-dark);
-  --color-gb-shell: var(--gb-shell);
-  --color-gb-shell-dark: var(--gb-shell-dark);
-  --color-gb-purple: var(--gb-purple);
-  --color-gb-red: var(--gb-red);
-}
+    /* Fonts */
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
+    /* Light theme colors (default) */
+    --color-bg-primary: #f8f6f3;
+    --color-bg-secondary: #efeae3;
+    --color-bg-tertiary: #e5ded4;
+    --color-text-primary: #1a1816;
+    --color-text-secondary: #4a4540;
+    --color-text-muted: #8a8378;
+    --color-accent: #b87333;
+    --color-accent-hover: #9a5f28;
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  user-select: none;
-  -webkit-user-select: none;
-}
+    /* Game Boy shell colors - Light theme (Classic Gray) */
+    --color-shell-primary: #c4c4c4;
+    --color-shell-secondary: #a8a8a8;
+    --color-shell-dark: #787878;
+    --color-shell-accent: #9b1b30;
 
-/* iOS safe area support */
-@supports (padding-top: env(safe-area-inset-top)) {
+    /* Screen bezel */
+    --color-screen-bezel: #5a5a5a;
+    --color-screen-inner: #2a2a2a;
+
+    /* Button colors */
+    --color-btn-dpad: #1a1a1a;
+    --color-btn-ab: #9b1b30;
+    --color-btn-menu: #6b6b6b;
+  }
+
+  /* Dark theme */
+  [data-theme="dark"] {
+    --color-bg-primary: #1a1816;
+    --color-bg-secondary: #252220;
+    --color-bg-tertiary: #302c28;
+    --color-text-primary: #f5f0e6;
+    --color-text-secondary: #c8c0b4;
+    --color-text-muted: #8a8378;
+    --color-accent: #d4956a;
+    --color-accent-hover: #e8a87a;
+
+    /* Game Boy shell colors - Dark theme (Deep Purple/Black) */
+    --color-shell-primary: #2d2640;
+    --color-shell-secondary: #1e1830;
+    --color-shell-dark: #14101f;
+    --color-shell-accent: #8b5cf6;
+
+    /* Screen bezel */
+    --color-screen-bezel: #3d3655;
+    --color-screen-inner: #0f0d14;
+
+    /* Button colors */
+    --color-btn-dpad: #1a1528;
+    --color-btn-ab: #8b5cf6;
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
   body {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-text-muted);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-secondary);
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-/* Game Boy screen effect */
-.gb-screen-container {
-  position: relative;
-  background: #0f380f;
-  border-radius: 8px;
-  padding: 8px;
-  box-shadow: 
-    inset 0 0 20px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(155, 188, 15, 0.2);
-}
-
-.gb-screen-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: 
-    repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.1) 0px,
-      rgba(0, 0, 0, 0.1) 1px,
-      transparent 1px,
-      transparent 2px
+/* Component styles */
+@layer components {
+  /* Game Boy Shell */
+  .gameboy-shell {
+    background: linear-gradient(
+      145deg,
+      var(--color-shell-primary) 0%,
+      var(--color-shell-secondary) 50%,
+      var(--color-shell-dark) 100%
     );
-  pointer-events: none;
-  border-radius: 8px;
-  z-index: 10;
+    border-radius: 1.5rem 1.5rem 3rem 3rem;
+    padding: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  /* Screen bezel */
+  .screen-bezel {
+    background: linear-gradient(
+      180deg,
+      var(--color-screen-bezel) 0%,
+      var(--color-screen-inner) 100%
+    );
+    border-radius: 0.5rem;
+    padding: 1rem 1rem 2rem 1rem;
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5),
+      0 2px 4px rgba(255, 255, 255, 0.05);
+  }
+
+  /* Game screen */
+  .game-screen {
+    border-radius: 0.25rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2);
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  /* D-Pad */
+  .dpad-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+  }
+
+  .dpad-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    background: var(--color-btn-dpad);
+    border-radius: 50%;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .dpad-btn {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: var(--color-btn-dpad);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .dpad-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .dpad-up {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 6px 6px 0 0;
+    height: 36px;
+  }
+
+  .dpad-down {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 0 0 6px 6px;
+    height: 36px;
+  }
+
+  .dpad-left {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 6px 0 0 6px;
+    width: 36px;
+  }
+
+  .dpad-right {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 0 6px 6px 0;
+    width: 36px;
+  }
+
+  /* Action buttons (A/B) */
+  .action-btn {
+    width: 48px;
+    height: 48px;
+    background: var(--color-btn-ab);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.1s ease;
+  }
+
+  .action-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Menu buttons (Start/Select) */
+  .menu-btn {
+    width: 60px;
+    height: 16px;
+    background: var(--color-btn-menu);
+    border: none;
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.1s ease;
+  }
+
+  .menu-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Primary button */
+  .btn-primary {
+    background: var(--color-accent);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Card */
+  .card {
+    background: var(--color-bg-secondary);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-bg-tertiary);
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    background: var(--color-bg-secondary);
+    border: 2px dashed var(--color-text-muted);
+    border-radius: 1rem;
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .drop-zone:hover {
+    border-color: var(--color-accent);
+    background: var(--color-bg-tertiary);
+  }
+
+  .drop-zone.dragging {
+    border-color: var(--color-accent);
+    background: var(--color-bg-tertiary);
+    transform: scale(1.02);
+  }
+
+  /* Theme toggle */
+  .theme-toggle {
+    width: 48px;
+    height: 28px;
+    background: var(--color-bg-tertiary);
+    border-radius: 14px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid var(--color-text-muted);
+  }
+
+  .theme-toggle::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+
+  [data-theme="dark"] .theme-toggle::after {
+    left: 22px;
+  }
 }
 
-/* D-Pad styling */
-.dpad-container {
-  position: relative;
-  width: 120px;
-  height: 120px;
-}
+/* Utility classes */
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--color-accent),
+      var(--color-accent-hover)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-.dpad-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  background: #2d2d2d;
-  border-radius: 50%;
-  z-index: 5;
-}
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
 
-.dpad-btn {
-  position: absolute;
-  background: linear-gradient(145deg, #3d3d3d, #2d2d2d);
-  border: none;
-  cursor: pointer;
-  transition: all 0.1s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
 
-.dpad-btn:active,
-.dpad-btn.pressed {
-  background: linear-gradient(145deg, #2d2d2d, #1d1d1d);
-  transform: scale(0.95);
-}
-
-.dpad-up,
-.dpad-down {
-  width: 40px;
-  height: 45px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.dpad-up {
-  top: 0;
-  border-radius: 8px 8px 0 0;
-}
-
-.dpad-down {
-  bottom: 0;
-  border-radius: 0 0 8px 8px;
-}
-
-.dpad-left,
-.dpad-right {
-  width: 45px;
-  height: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.dpad-left {
-  left: 0;
-  border-radius: 8px 0 0 8px;
-}
-
-.dpad-right {
-  right: 0;
-  border-radius: 0 8px 8px 0;
-}
-
-/* Action buttons */
-.action-btn {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #cc3333, #992222);
-  border: 3px solid #661111;
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
-  font-family: system-ui, -apple-system, sans-serif;
-  cursor: pointer;
-  transition: all 0.1s ease;
-  box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.4),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2);
-}
-
-.action-btn:active,
-.action-btn.pressed {
-  transform: scale(0.92);
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.4),
-    inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Start/Select buttons */
-.menu-btn {
-  width: 60px;
-  height: 20px;
-  border-radius: 10px;
-  background: linear-gradient(145deg, #5c5c5c, #4a4a4a);
-  border: none;
-  color: #888;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.1s ease;
-}
-
-.menu-btn:active,
-.menu-btn.pressed {
-  background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
-  transform: scale(0.95);
+  .animate-pulse-subtle {
+    animation: pulseSuttle 2s ease-in-out infinite;
+  }
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+@keyframes pulseSuttle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
-.animate-pulse {
-  animation: pulse 2s infinite;
+/* Responsive breakpoints */
+@media (max-width: 480px) {
+  .gameboy-shell {
+    padding: 1rem;
+    border-radius: 1rem 1rem 2rem 2rem;
+  }
+
+  .screen-bezel {
+    padding: 0.75rem 0.75rem 1.5rem 0.75rem;
+  }
+
+  .dpad-container {
+    width: 90px;
+    height: 90px;
+  }
+
+  .action-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (min-width: 768px) {
+  .gameboy-shell {
+    padding: 2rem;
+  }
+
+  .dpad-container {
+    width: 110px;
+    height: 110px;
+  }
+
+  .dpad-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .dpad-up,
+  .dpad-down {
+    height: 40px;
+  }
+
+  .dpad-left,
+  .dpad-right {
+    width: 40px;
+  }
+
+  .action-btn {
+    width: 56px;
+    height: 56px;
+    font-size: 1.125rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .gameboy-shell {
+    transform: scale(1.1);
+  }
 }
