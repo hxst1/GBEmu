@@ -1,0 +1,87 @@
+# ================================
+# GLOBAL
+# ================================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.lock
+.env
+.env.*
+
+
+# ================================
+# RUST CORE (./core)
+# ================================
+
+# Cargo build outputs
+core/target/
+core/.cargo
+
+# Rust toolchains / artifacts
+core/Cargo.lock     # Opcional: ignóralo si deseas reproducibilidad exacta
+# (Si quieres precisión exacta de builds, elimina esta línea)
+
+
+# ================================
+# WASM-PACK OUTPUT
+# ================================
+# wasm-pack genera archivos en /web/lib/wasm/
+# Debemos IGNORAR el .wasm generado aquí, pero NO el JS ni los .d.ts
+
+web/lib/wasm/*.wasm          # ignorar wasm crudo generado
+!web/lib/wasm/gbemu_core.js  # mantener bindings JS
+!web/lib/wasm/gbemu_core.d.ts
+!web/lib/wasm/package.json
+web/lib/wasm/.gitignore      # mantener su gitignore interno (si existe)
+
+
+# ================================
+# PUBLIC WASM (archivo necesario en Vercel)
+# ================================
+# ESTE SÍ debe quedar en el repo, así que no lo ignoramos:
+# web/public/wasm/gbemu_core_bg.wasm
+
+# Pero evita que se ignoren por reglas globales:
+!web/public/wasm/
+!web/public/wasm/gbemu_core_bg.wasm
+
+
+# ================================
+# NEXT.JS (./web)
+# ================================
+web/.next/
+web/out/
+web/.vercel/
+web/dist/
+
+
+# ================================
+# NODE (./web)
+# ================================
+web/node_modules/
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/pnpm-debug.log*
+web/package-lock.json      # opcional: borrar si usas npm; mantener si quieres
+web/pnpm-lock.yaml         # depende del gestor que uses
+web/yarn.lock
+
+
+# ================================
+# EDITOR / IDE
+# ================================
+.vscode/
+.idea/
+*.code-workspace
+
+
+# ================================
+# BUILD SCRIPT OUTPUT
+# ================================
+# Build.sh copia WASM final a /web/public/wasm/
+# Ese SÍ debe estar, por lo que solo ignoramos basura extra.
+/web/public/*.tmp
+/web/public/*.map

@@ -1,0 +1,43 @@
+[package]
+name = "gbemu-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["GameBoy Emulator Team"]
+description = "High-accuracy Game Boy (DMG/CGB) emulator core in Rust"
+license = "MIT"
+rust-version = "1.78"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["wasm"]
+wasm = ["wasm-bindgen", "console_error_panic_hook", "web-sys", "js-sys"]
+debug = []
+
+[dependencies]
+wasm-bindgen = { version = "0.2.99", optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+web-sys = { version = "0.3.76", optional = true, features = [
+    "console",
+    "Performance",
+    "Window",
+] }
+js-sys = { version = "0.3.76", optional = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bitflags = "2.6"
+log = "0.4"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.release-wasm]
+inherits = "release"
+opt-level = "z"

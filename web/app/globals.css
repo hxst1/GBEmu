@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+:root {
+  --gb-screen: #9bbc0f;
+  --gb-light: #8bac0f;
+  --gb-medium: #306230;
+  --gb-dark: #0f380f;
+  --gb-shell: #8b8b8b;
+  --gb-shell-dark: #5c5c5c;
+  --gb-purple: #463d5e;
+  --gb-red: #cc3333;
+}
+
+@theme {
+  --color-gb-screen: var(--gb-screen);
+  --color-gb-light: var(--gb-light);
+  --color-gb-medium: var(--gb-medium);
+  --color-gb-dark: var(--gb-dark);
+  --color-gb-shell: var(--gb-shell);
+  --color-gb-shell-dark: var(--gb-shell-dark);
+  --color-gb-purple: var(--gb-purple);
+  --color-gb-red: var(--gb-red);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* iOS safe area support */
+@supports (padding-top: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Game Boy screen effect */
+.gb-screen-container {
+  position: relative;
+  background: #0f380f;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 
+    inset 0 0 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(155, 188, 15, 0.2);
+}
+
+.gb-screen-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  pointer-events: none;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+/* D-Pad styling */
+.dpad-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.dpad-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background: #2d2d2d;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.dpad-btn {
+  position: absolute;
+  background: linear-gradient(145deg, #3d3d3d, #2d2d2d);
+  border: none;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpad-btn:active,
+.dpad-btn.pressed {
+  background: linear-gradient(145deg, #2d2d2d, #1d1d1d);
+  transform: scale(0.95);
+}
+
+.dpad-up,
+.dpad-down {
+  width: 40px;
+  height: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.dpad-up {
+  top: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.dpad-down {
+  bottom: 0;
+  border-radius: 0 0 8px 8px;
+}
+
+.dpad-left,
+.dpad-right {
+  width: 45px;
+  height: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.dpad-left {
+  left: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+.dpad-right {
+  right: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Action buttons */
+.action-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #cc3333, #992222);
+  border: 3px solid #661111;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.action-btn:active,
+.action-btn.pressed {
+  transform: scale(0.92);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Start/Select buttons */
+.menu-btn {
+  width: 60px;
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #5c5c5c, #4a4a4a);
+  border: none;
+  color: #888;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.menu-btn:active,
+.menu-btn.pressed {
+  background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+  transform: scale(0.95);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}

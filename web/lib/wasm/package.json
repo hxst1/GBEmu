@@ -1,0 +1,20 @@
+{
+  "name": "gbemu-core",
+  "type": "module",
+  "collaborators": [
+    "GameBoy Emulator Team"
+  ],
+  "description": "High-accuracy Game Boy (DMG/CGB) emulator core in Rust",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "gbemu_core_bg.wasm",
+    "gbemu_core.js",
+    "gbemu_core.d.ts"
+  ],
+  "main": "gbemu_core.js",
+  "types": "gbemu_core.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
