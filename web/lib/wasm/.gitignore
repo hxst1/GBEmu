@@ -1,6 +1,3 @@
-# Ignorar solo los artefactos WASM crudos
-*.wasm
-
 # Pero mantener el JS, Typescript y Package info generados por wasm-pack
 !*.js
 !*.d.ts
