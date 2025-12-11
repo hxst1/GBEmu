@@ -1,5 +1,8 @@
 "use client";
 
+export const ssr = false;
+export const dynamic = "force-dynamic";
+
 import { useState, useCallback } from "react";
 import { EmulatorProvider, useEmulator } from "@/components/EmulatorContext";
 import { RomLoader } from "@/components/RomLoader";
@@ -71,7 +74,6 @@ function EmulatorUI() {
 
       {/* Modals */}
       {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
-
       {showSaves && <SaveManager onClose={() => setShowSaves(false)} />}
     </div>
   );

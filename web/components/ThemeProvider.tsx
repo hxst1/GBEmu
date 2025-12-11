@@ -18,11 +18,18 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
-export function useTheme() {
+export function useTheme(): ThemeContextType {
   const context = useContext(ThemeContext);
+
   if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    // Fallback seguro para build/SSR o uso fuera de provider
+    return {
+      theme: "light",
+      toggleTheme: () => {},
+      setTheme: () => {},
+    };
   }
+
   return context;
 }
 
@@ -30,22 +37,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme from localStorage or system preference
   useEffect(() => {
     setMounted(true);
 
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    if (savedTheme) {
-      setThemeState(savedTheme);
-      document.documentElement.setAttribute("data-theme", savedTheme);
-    } else {
-      // Check system preference
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      const initialTheme = prefersDark ? "dark" : "light";
-      setThemeState(initialTheme);
-      document.documentElement.setAttribute("data-theme", initialTheme);
+    try {
+      const savedTheme = localStorage.getItem("theme") as Theme | null;
+      if (savedTheme === "light" || savedTheme === "dark") {
+        setThemeState(savedTheme);
+        document.documentElement.setAttribute("data-theme", savedTheme);
+      } else {
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        const initialTheme: Theme = prefersDark ? "dark" : "light";
+        setThemeState(initialTheme);
+        document.documentElement.setAttribute("data-theme", initialTheme);
+      }
+    } catch {
+      setThemeState("light");
+      document.documentElement.setAttribute("data-theme", "light");
     }
   }, []);
 
@@ -54,9 +64,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e: MediaQueryListEvent) => {
-      // Only auto-switch if user hasn't set a preference
       if (!localStorage.getItem("theme")) {
-        const newTheme = e.matches ? "dark" : "light";
+        const newTheme: Theme = e.matches ? "dark" : "light";
         setThemeState(newTheme);
         document.documentElement.setAttribute("data-theme", newTheme);
       }
@@ -68,7 +77,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("theme", newTheme);
+    try {
+      localStorage.setItem("theme", newTheme);
+    } catch {
+      // ignore
+    }
     document.documentElement.setAttribute("data-theme", newTheme);
   }, []);
 

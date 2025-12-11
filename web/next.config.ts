@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Output standalone for optimized production builds
-  output: "standalone",
-
   // Disable strict mode for better compatibility with WASM
   reactStrictMode: false,
 
