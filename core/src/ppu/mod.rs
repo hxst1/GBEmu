@@ -340,37 +340,37 @@ impl Ppu {
         let bgp = mmu.io()[0x47];
         
         let tile_map_base: u16 = if lcdc & 0x08 != 0 { 0x9C00 } else { 0x9800 };
-        let tile_data_base: u16 = if lcdc & 0x10 != 0 { 0x8000 } else { 0x8800 };
         let signed_addressing = lcdc & 0x10 == 0;
         
         let y = self.ly.wrapping_add(scy);
-        let tile_row = y / 8;
-        let pixel_row = y % 8;
+        let tile_row = (y / 8) as u16;
+        let pixel_row = (y % 8) as u16;
         
         for screen_x in 0..SCREEN_WIDTH {
             let x = (screen_x as u8).wrapping_add(scx);
-            let tile_col = x / 8;
+            let tile_col = (x / 8) as u16;
             let pixel_col = 7 - (x % 8);
             
             // Get tile index from tile map
-            let map_addr = tile_map_base + (tile_row as u16 * 32) + tile_col as u16;
+            let map_addr = tile_map_base + (tile_row * 32) + tile_col;
             let tile_index = mmu.read_byte(map_addr);
             
             // Calculate tile data address
             let tile_addr = if signed_addressing {
+                // Base is 0x9000, tile index is signed (-128 to 127)
                 let signed_index = tile_index as i8 as i16;
-                (tile_data_base as i16 + (signed_index + 128) * 16 + (pixel_row as i16 * 2)) as u16
+                (0x9000i32 + (signed_index as i32 * 16) + (pixel_row as i32 * 2)) as u16
             } else {
-                tile_data_base + (tile_index as u16 * 16) + (pixel_row as u16 * 2)
+                // Base is 0x8000, tile index is unsigned (0 to 255)
+                0x8000 + (tile_index as u16 * 16) + (pixel_row * 2)
             };
             
             // Get tile data
             let low = mmu.read_byte(tile_addr);
-            let high = mmu.read_byte(tile_addr + 1);
+            let high = mmu.read_byte(tile_addr.wrapping_add(1));
             
             // Get color index
-            let color_bit = pixel_col;
-            let color_index = ((high >> color_bit) & 1) << 1 | ((low >> color_bit) & 1);
+            let color_index = ((high >> pixel_col) & 1) << 1 | ((low >> pixel_col) & 1);
             
             bg_priority[screen_x] = color_index;
             
@@ -393,36 +393,36 @@ impl Ppu {
         }
         
         let tile_map_base: u16 = if lcdc & 0x40 != 0 { 0x9C00 } else { 0x9800 };
-        let tile_data_base: u16 = if lcdc & 0x10 != 0 { 0x8000 } else { 0x8800 };
         let signed_addressing = lcdc & 0x10 == 0;
         
         let window_y = self.window_line;
-        let tile_row = window_y / 8;
-        let pixel_row = window_y % 8;
+        let tile_row = (window_y / 8) as u16;
+        let pixel_row = (window_y % 8) as u16;
         
         let window_x_start = wx.saturating_sub(7) as usize;
         let mut drew_window = false;
         
         for screen_x in window_x_start..SCREEN_WIDTH {
             let window_x = (screen_x - window_x_start) as u8;
-            let tile_col = window_x / 8;
+            let tile_col = (window_x / 8) as u16;
             let pixel_col = 7 - (window_x % 8);
             
-            let map_addr = tile_map_base + (tile_row as u16 * 32) + tile_col as u16;
+            let map_addr = tile_map_base + (tile_row * 32) + tile_col;
             let tile_index = mmu.read_byte(map_addr);
             
             let tile_addr = if signed_addressing {
+                // Base is 0x9000, tile index is signed (-128 to 127)
                 let signed_index = tile_index as i8 as i16;
-                (tile_data_base as i16 + (signed_index + 128) * 16 + (pixel_row as i16 * 2)) as u16
+                (0x9000i32 + (signed_index as i32 * 16) + (pixel_row as i32 * 2)) as u16
             } else {
-                tile_data_base + (tile_index as u16 * 16) + (pixel_row as u16 * 2)
+                // Base is 0x8000, tile index is unsigned (0 to 255)
+                0x8000 + (tile_index as u16 * 16) + (pixel_row * 2)
             };
             
             let low = mmu.read_byte(tile_addr);
-            let high = mmu.read_byte(tile_addr + 1);
+            let high = mmu.read_byte(tile_addr.wrapping_add(1));
             
-            let color_bit = pixel_col;
-            let color_index = ((high >> color_bit) & 1) << 1 | ((low >> color_bit) & 1);
+            let color_index = ((high >> pixel_col) & 1) << 1 | ((low >> pixel_col) & 1);
             
             bg_priority[screen_x] = color_index;
             
@@ -554,12 +554,12 @@ impl Ppu {
     fn apply_dmg_palette(&self, color_index: u8, palette: u8) -> [u8; 4] {
         let shade = (palette >> (color_index * 2)) & 0x03;
         
-        // Classic Game Boy green shades
+        // Modern LCD-style grayscale (easier on the eyes)
         match shade {
-            0 => [0x9B, 0xBC, 0x0F, 0xFF], // Lightest
-            1 => [0x8B, 0xAC, 0x0F, 0xFF],
-            2 => [0x30, 0x62, 0x30, 0xFF],
-            3 => [0x0F, 0x38, 0x0F, 0xFF], // Darkest
+            0 => [0xE0, 0xF8, 0xD0, 0xFF], // Lightest - slight warm tint
+            1 => [0x88, 0xC0, 0x70, 0xFF], // Light
+            2 => [0x34, 0x68, 0x56, 0xFF], // Dark
+            3 => [0x08, 0x18, 0x20, 0xFF], // Darkest - near black
             _ => unreachable!(),
         }
     }
