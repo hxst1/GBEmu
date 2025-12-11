@@ -554,12 +554,12 @@ impl Ppu {
     fn apply_dmg_palette(&self, color_index: u8, palette: u8) -> [u8; 4] {
         let shade = (palette >> (color_index * 2)) & 0x03;
         
-        // Modern LCD-style grayscale (easier on the eyes)
+        // Warm beige/sepia tones - easy on the eyes
         match shade {
-            0 => [0xE0, 0xF8, 0xD0, 0xFF], // Lightest - slight warm tint
-            1 => [0x88, 0xC0, 0x70, 0xFF], // Light
-            2 => [0x34, 0x68, 0x56, 0xFF], // Dark
-            3 => [0x08, 0x18, 0x20, 0xFF], // Darkest - near black
+            0 => [0xF5, 0xF0, 0xE6, 0xFF], // Lightest - warm white/cream
+            1 => [0xC8, 0xB8, 0x9A, 0xFF], // Light beige
+            2 => [0x7A, 0x6A, 0x52, 0xFF], // Dark brown
+            3 => [0x26, 0x22, 0x1C, 0xFF], // Darkest - near black with warm tint
             _ => unreachable!(),
         }
     }
